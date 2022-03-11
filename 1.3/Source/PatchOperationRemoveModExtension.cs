@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Verse;
 
-namespace POME
+namespace mMEPO
 {
     internal class PatchOperationRemoveModExtension : PatchOperationPathed
     {
@@ -29,29 +29,27 @@ namespace POME
                 {
                     //search through def's entire modExt list until match
                     bool anyMatchingModExt = false;
-                    foreach (XmlNode refNode in xpathXmlNodeModExt.ChildNodes)
+                    for (int y = 0; y < xpathXmlNodeModExt.ChildNodes.Count; ++y)
                     {
+                        XmlNode refNode = xpathXmlNodeModExt.ChildNodes[y];
                         //find a matching modExt, now replace it
-                        Log.Message("looking for modExt Class: " + refNode.Attributes["Class"].ToString());
-                        if (refNode.Attributes["Class"].ToString() == modExtClassName)
+                        if (refNode.Attributes["Class"].Value == modExtClassName)
                         {
                             xpathXmlNodeModExt.RemoveChild(refNode);
-                            Log.Message("removed modExt @ def: " + xpathXmlNode.Name);
+                            //Log.Message("removed modExt @ def: " + xpathXmlNode.Name);
+                            anyMatchingModExt = true;
                             break;
                         }
                     }
 
                     if (!anyMatchingModExt)
                     {
-                        Log.Message("Didn't find any matching modExt @ def: " + xpathXmlNode.Name);
+                        Log.Error("Didn't find any matching modExt @ def: " + xpathXmlNode.Name);
                         return false;
                     }
                 }
                 else
-                {
-                    Log.Error("modExtensions xmlNode not found for at least one matching xpath node");
-                    return false;
-                }
+                    Log.Warning("modExtensions xmlNode not found for at least one matching xpath node w/ Remove ModExt");
 
 
             } result = true;

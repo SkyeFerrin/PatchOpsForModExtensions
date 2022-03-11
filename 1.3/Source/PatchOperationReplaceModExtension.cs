@@ -8,7 +8,7 @@ using Verse;
 
 
 
-namespace POME
+namespace mMEPO
 {
     internal class PatchOperationReplaceModExtension : PatchOperationPathed
     {
@@ -24,41 +24,49 @@ namespace POME
             XmlNodeList xpathNodes = xml.SelectNodes(xpath);
             bool result = xpathNodes != null ? true : false;
 
+            //get value's li element's Class attribute
+            XmlAttribute valueClassAttributes = valNode.FirstChild.Attributes["Class"];
+            if (valueClassAttributes == null)
+            {
+                Log.Error("Null Class Attribute for modExt");
+                return false;
+            }
+
+            //Log.Message("modExt Class Attribute: " + valueClassAttributes.Value);
+
             for (int i = 0; i < xpathNodes.Count; ++i)
             {
                 XmlNode xpathXmlNode = xpathNodes[i];
-                //get value's li element's Class attribute
-                XmlAttribute valueClassAttributes = valNode.FirstChild.Attributes["Class"];
-                if (valueClassAttributes != null)
-                    Log.Message("modExt Class Attribute: " + valueClassAttributes.Value);
-                else
-                {
-                    Log.Error("Null Class Attribute for modExt");
-                    return false;
-                }
-
                 XmlNode xpathXmlNodeModExt = xpathXmlNode["modExtensions"];
 
                 //Class Attribute has to match one of the modExts in each xpathnode
+                bool anyMatchingModExt = false;
                 if (xpathXmlNodeModExt != null)
                 {
                     //search through def's entire modExt list until match
-                    foreach (XmlNode refNode in xpathXmlNodeModExt.ChildNodes)
+                    for (int y = 0; y < xpathXmlNodeModExt.ChildNodes.Count; ++y)
                     {
+                        XmlNode refNode = xpathXmlNodeModExt.ChildNodes[y];
                         //find a matching modExt, now replace it
-                        if (refNode.Attributes["Class"] == valueClassAttributes)
+                        if (refNode.Attributes["Class"].Value == valueClassAttributes.Value)
                         {
-                            result = true;
-                            foreach (XmlNode valChildNode in valNode.ChildNodes)
+                            for (int z = 0; z < valNode.ChildNodes.Count; ++z)
                             {
-                                xpathXmlNodeModExt.InsertBefore(xpathXmlNodeModExt.OwnerDocument.ImportNode(valChildNode, deep: true), refNode);
+                                xpathXmlNodeModExt.InsertBefore(xpathXmlNodeModExt.OwnerDocument.ImportNode(valNode.ChildNodes[z], deep: true), refNode);
                             }
                             xpathXmlNodeModExt.RemoveChild(refNode);
-                            Log.Message("Replaced modExt @ def: " + xpathXmlNode.Name);
+                            //Log.Message("Replaced modExt @ def: " + xpathXmlNode.Name);
+                            anyMatchingModExt = true;
                             break;
                         }
-
                     }
+
+                    if (!anyMatchingModExt)
+                    {
+                        Log.Error("modExtensions list for def does not contain any matching modExt");
+                        return false;
+                    }
+
                 }
                 else
                 {
@@ -67,7 +75,7 @@ namespace POME
                 }
 
 
-            }
+            } result = true;
             return result;
         }
     }

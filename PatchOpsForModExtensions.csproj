@@ -7,8 +7,8 @@
     <ProjectGuid>{9991635E-69E9-4819-B7B2-151BC576936C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>POME</RootNamespace>
-    <AssemblyName>PatchOpsForModExtensions</AssemblyName>
+    <RootNamespace>mMEPO</RootNamespace>
+    <AssemblyName>mMEPO</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -54,9 +54,15 @@
     <Compile Include="1.3\Source\PatchOperationReplaceModExtension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <Content Include="1.3\Assemblies\PatchOpsForModExtensions.dll" />
+    <None Include=".editorconfig" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="About\About.xml" />
+    <Content Include="About\Preview.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="1.3\Assemblies\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

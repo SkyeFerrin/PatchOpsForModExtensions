@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ModMetaData>
+	<name>More Mod Extension Patch Operations</name>
+	<author>Skye</author>
+	<supportedVersions>
+		<li>1.3</li>
+	</supportedVersions>
+	<packageId>Skye.mMEPO</packageId>
+	<description>
+		This is a small mod extension patch operation framework mod. It simply adds 3 new patch ops for mod extensions: mMEPO.PatchOperationRemoveModExtension, mMEPO.PatchOperationReplaceModExtension, and inspired by XML Extensions' PatchOperationAddOrReplace, there's a mMEPO.PatchOperationAddOrReplaceModExtension. This mod should make patch operations to overwrite, replace, or remove mod extensions much easier.
+	</description>
+</ModMetaData>
