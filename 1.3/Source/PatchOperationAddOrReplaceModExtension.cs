@@ -8,22 +8,21 @@ using Verse;
 
 namespace mMEPO
 {
-    //make sure description says it will add if no modExtension of type given currently exists
-    //(so don't mispell your modExt's Class name, or miss the namespace)}?"
-
+    // PatchOp intent:
+    // Will add modExt if modExtensions tag doesn't exist, or if modExt w/ Class name matching that of the class name in the value node
+    // Will replace modExt if it finds any modExt w/ matching class name attribute @ xpath node
+    // This whole patch operation is applied for each matching node the xpath points to
     internal class PatchOperationAddOrReplaceModExtension : PatchOperationPathed
     {
         public XmlContainer value;
 
-        //replacing multiple Mod Extensions needs a new PatchOpReplaceModExt for each,
-        //make sure thats explicitly mentioned in the description
+        //replacing/adding multiple Mod Extensions per matching xpath node needs a new PatchOpAddOrReplaceModExt for each
         protected override bool ApplyWorker(XmlDocument xml)
         {
-            //implement
             XmlNode valNode = value.node;
 
-            XmlNodeList xpathNodes = xml.SelectNodes(xpath);
-            bool result = xpathNodes != null ? true : false;
+            XmlNodeList matchingNodes = xml.SelectNodes(xpath);
+            bool result = matchingNodes != null ? true : false;
 
             //get value's li element's Class attribute
             XmlAttribute valueClassAttributes = valNode.FirstChild.Attributes["Class"];
@@ -35,34 +34,34 @@ namespace mMEPO
 
             //Log.Message("modExt Class Attribute: " + valueClassAttributes.Value);
 
-            for (int i = 0; i < xpathNodes.Count; ++i)
+            for (int i = 0; i < matchingNodes.Count; ++i)
             {
-                XmlNode xpathXmlNode = xpathNodes[i];
-                XmlNode xpathXmlNodeModExt = xpathXmlNode["modExtensions"];
+                XmlNode matchingNode = matchingNodes[i];
+                XmlNode modExtensionsNode = matchingNode["modExtensions"];
                 //if def doesn't have a modExt list, add it and add the modExt
-                if (xpathXmlNodeModExt == null)
+                if (modExtensionsNode == null)
                 {
-                    Log.Warning("Added modExt & modExts list (node didn't exist) @ def: " + xpathXmlNode.Name);
-                    xpathXmlNodeModExt = xpathXmlNode.OwnerDocument.CreateElement("modExtensions");
-                    xpathXmlNodeModExt.AppendChild(xpathXmlNodeModExt.OwnerDocument.ImportNode(valNode.FirstChild, deep: true));
+                    Log.Warning("Added modExt & modExts list (node didn't exist) @ def: " + matchingNode.Name);
+                    modExtensionsNode = matchingNode.OwnerDocument.CreateElement("modExtensions");
+                    modExtensionsNode.AppendChild(modExtensionsNode.OwnerDocument.ImportNode(valNode.FirstChild, deep: true));
                 }
                 else
                 {
                     //Class Attribute has to match one of the modExts in each xpathnode
                     //search through def's entire modExt list until match
                     bool anyMatchingModExt = false;
-                    for (int y = 0; y < xpathXmlNodeModExt.ChildNodes.Count; ++y)
+                    for (int y = 0; y < modExtensionsNode.ChildNodes.Count; ++y)
                     {
-                        XmlNode refNode = xpathXmlNodeModExt.ChildNodes[y];
+                        XmlNode refNode = modExtensionsNode.ChildNodes[y];
                         //find a matching modExt, now replace it
                         if (refNode.Attributes["Class"].Value == valueClassAttributes.Value)
                         {
                             for(int z = 0; z < valNode.ChildNodes.Count; ++z)
                             {
-                                xpathXmlNodeModExt.InsertBefore(xpathXmlNodeModExt.OwnerDocument.ImportNode(valNode.ChildNodes[z], deep: true), refNode);
+                                modExtensionsNode.InsertBefore(modExtensionsNode.OwnerDocument.ImportNode(valNode.ChildNodes[z], deep: true), refNode);
                             }
-                            xpathXmlNodeModExt.RemoveChild(refNode);
-                            //Log.Message("Replaced modExt @ def: " + xpathXmlNode.Name);
+                            modExtensionsNode.RemoveChild(refNode);
+                            //Log.Message("Replaced modExt @ def: " + matchingNode.Name);
                             anyMatchingModExt = true;
                             break;
                         }
@@ -71,8 +70,8 @@ namespace mMEPO
                     //patchop adding modExt case instead of replacing
                     if (!anyMatchingModExt)
                     {
-                        //Log.Message("Added modExt @ def: " + xpathXmlNode.Name);
-                        xpathXmlNodeModExt.AppendChild(xpathXmlNodeModExt.OwnerDocument.ImportNode(valNode.FirstChild, deep: true));
+                        //Log.Message("Added modExt @ def: " + matchingNode.Name);
+                        modExtensionsNode.AppendChild(modExtensionsNode.OwnerDocument.ImportNode(valNode.FirstChild, deep: true));
                     }
                 }
             }

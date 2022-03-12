@@ -58,11 +58,10 @@
     <None Include=".editorconfig" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="1.3\Assemblies\mMEPO.dll" />
     <Content Include="About\About.xml" />
     <Content Include="About\Preview.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="1.3\Assemblies\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
